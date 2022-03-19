@@ -2,37 +2,38 @@ import React, {Component} from 'react';
 import User from "./User";
 
 class App extends Component {
-
-    state = {inputValue: 1, user: false}
-    inputMain = React.createRef()
+    myDiv = React.createRef();
+    state = {inputValue: 0, user: false}
+    click = () => {
+        console.log(this.myDiv.current.innerText)
+    }
     onFormSubmit = (e) => {
-        e.preventDefault()
-        console.log(this.inputMain.current.value)
+        e.preventDefault();
 
 
     }
-    onInputFill = () => {
-
-        this.setState({inputValue: this.inputMain.current.value})
-        this.setState({user: false})
-
+    input = () => {
+        this.setState({inputValue: this.myDiv.current.value, user:false})
     }
-    onClick = () => {
+    onUser = () => {
         this.setState({user: true})
-
     }
+
 
     render() {
         let {inputValue, user} = this.state;
-
+        let disabled;
         return (
             <div>
                 <form onSubmit={this.onFormSubmit}>
-                    <input ref={this.inputMain} onInput={this.onInputFill} type={'number'} value={inputValue}/>
-                    {((inputValue < 11) && (inputValue > 0)) && (<button onClick={this.onClick} >send</button>)                   }
 
- {user && <User id={inputValue} key={inputValue}/>  }
+                    <input ref={this.myDiv} onClick={this.click} type={"number"} onInput={this.input}
+                           value={inputValue}/>
+                    {((inputValue < 1) || (inputValue > 10)) ? (disabled = true) : disabled = false}
+                    <button disabled={disabled} onClick={this.onUser}> send</button>
+
                 </form>
+                {user&& <User id={inputValue}/>}
             </div>
         );
     }
