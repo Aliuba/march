@@ -1,42 +1,52 @@
-import React, {Component} from 'react';
-import User from "./User";
-
-class App extends Component {
-    myDiv = React.createRef();
-    state = {inputValue: 0, user: false}
-    click = () => {
-        console.log(this.myDiv.current.innerText)
-    }
-    onFormSubmit = (e) => {
-        e.preventDefault();
-
-
-    }
-    input = () => {
-        this.setState({inputValue: this.myDiv.current.value, user:false})
-    }
-    onUser = () => {
-        this.setState({user: true})
+import React, {useEffect, useReducer, useState} from 'react';
+const initialstate=null
+function reducer(state, action){
+    switch (action.type){
+        case "todo":{
+            return action.payload
+        }
+        case "name":{
+           return{...state,
+                name:action.payload}
+        }
+        default: {
+            console.log("error")
+        }
     }
 
-
-    render() {
-        let {inputValue, user} = this.state;
-        let disabled;
-        return (
-            <div>
-                <form onSubmit={this.onFormSubmit}>
-
-                    <input ref={this.myDiv} onClick={this.click} type={"number"} onInput={this.input}
-                           value={inputValue}/>
-                    {((inputValue < 1) || (inputValue > 10)) ? (disabled = true) : disabled = false}
-                    <button disabled={disabled} onClick={this.onUser}> send</button>
-
-                </form>
-                {user&& <User id={inputValue}/>}
-            </div>
-        );
-    }
 }
+export default function App() {
+    const [count, SetCount] = useState(1)
+    const [inputValue, setValue]=useState("")
+    const[state, dispatch]=useReducer(reducer, initialstate)
+    const inc = () => {
+        SetCount((val) => val + 1)
+    }
+    const res=()=>{
+        SetCount(0)
+    }
+    const fetchData=()=>{
+        fetch('https://jsonplaceholder.typicode.com/users/'+ count)
+            .then(response => response.json())
+            .then(json => dispatch({type:"todo", payload: json }))
 
-export default App;
+
+    }
+    const nameChange=()=>{
+        dispatch({type:"name", payload:inputValue })
+    }
+    useEffect(()=>{
+        fetchData();
+    }, [count])
+    return (
+        <div>
+            <h1> count {count}</h1>
+            <button onClick={inc}>inc</button>
+            <button onClick={res}>res</button>
+            <input value={inputValue} onChange={({target:{value}})=>setValue(value)}/>
+            <button onClick={nameChange}>name</button>
+            {!!state&&<div>{state.id}--{state.name}-{state.username}</div>}
+
+        </div>
+    );
+}
